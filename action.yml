@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://www.schemastore.org/github-action.json
+
+name: 'Setup Fly'
+description: 'Install flyctl'
+inputs:
+  version:
+    description: 'Version to install, ex: 0.4.61'
+    default: '0.4.61'
+  checksum:
+    description: 'SHA256 checksum of download artifact'
+    default: '160763f890703dd0cb06588f14d739604778af4a2657e9af6d6d32786487cc60'
+
+runs:
+  using: "composite"
+  steps:
+    - id: cache-flyctl
+      name: Cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+      with:
+        path: ~/.cache/setup-fly
+        key: setup-fly-1|${{ inputs.version }}|${{ inputs.checksum }}
+
+    - name: Download flyctl
+      if: steps.cache-flyctl.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        FLYCTL_VERSION: ${{ inputs.version }}
+        FLYCTL_CHECKSUM: ${{ inputs.checksum }}
+      run: |
+        mkdir -p ~/.cache/setup-fly
+        "${GITHUB_ACTION_PATH}/download-artifact.sh" \
+          "https://github.com/superfly/flyctl/releases/download/v${FLYCTL_VERSION}/flyctl_${FLYCTL_VERSION}_Linux_x86_64.tar.gz" \
+          ~/.cache/setup-fly/artifact.tar.gz \
+          "${FLYCTL_CHECKSUM}"
+
+    - name: Install flyctl
+      shell: bash
+      run: |
+        install_dir=~/.local/bin
+        mkdir -p "${install_dir}"
+        cd ~/.cache/setup-fly
+        tar -xzf artifact.tar.gz
+        chmod +x flyctl
+        mv flyctl "${install_dir}"
+        echo "${install_dir}" >>"${GITHUB_PATH}"
