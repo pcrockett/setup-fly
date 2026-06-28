@@ -1,0 +1,11 @@
+_commit: ca8c62b
+_src_path: gh:pcrockett/template-setup-action
+action_description: Installs flyctl in your GitHub workflows
+action_human_friendly_name: Setup Flyctl
+action_name: setup-fly
+github_org: ''
+tool_doc_url: https://fly.io/docs/flyctl/
+tool_download_url: https://github.com/superfly/flyctl/releases/download/v${VERSION}/flyctl_${VERSION}_Linux_x86_64.tar.gz
+tool_latest_checksum: 160763f890703dd0cb06588f14d739604778af4a2657e9af6d6d32786487cc60
+tool_latest_version: 0.4.61
+tool_name: flyctl
