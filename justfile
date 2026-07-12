@@ -28,17 +28,14 @@ update:
         http get $download_url | save --raw $archive
         "Computing checksum..." | print
         let checksum = open --raw $archive | hash sha256
-        let action = open action.yml
-
-        "Update action.yml inputs to look like this:" | print
         (
-            $action
-            | update inputs.version.default $version
-            | update inputs.checksum.default $checksum
-            | select inputs
-            | to yaml
-            | ^bat --no-pager --language yaml
+            open --raw action.yml
+            | ^awk -f update.awk
+                $"VERSION=($version)"
+                $"CHECKSUM=($checksum)"
+            | save --raw $"($temp_dir)/action.yml"
         )
+        mv $"($temp_dir)/action.yml" .
 
     } catch {|err|
         do $cleanup
