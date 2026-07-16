@@ -43,3 +43,7 @@ update:
         error make $err
     }
     do $cleanup
+
+# Update this repo from its copier template
+update-template:
+    copier update
