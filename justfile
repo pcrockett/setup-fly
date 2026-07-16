@@ -12,37 +12,46 @@ release:
 
 # Update default version and checksum to latest GitHub release
 update:
-    #!/usr/bin/env nu
-    let discover_url = $"https://api.fly.io/app/flyctl_releases/Linux/x86_64/latest"
-    let download_url = http get $discover_url
-    let version = (
-        $download_url
-        | parse --regex "/v(?<version>[0-9.]+)/"
-        | first
-        | get version
-    )
-    let temp_dir = mktemp --directory
-    let cleanup = { rm --recursive --force $temp_dir }
-    try {
-        let archive = $"($temp_dir)/archive.tar.gz"
-        $"Downloading <($download_url)>..." | print
-        http get $download_url | save --raw $archive
-        "Computing checksum..." | print
-        let checksum = open --raw $archive | hash sha256
-        (
-            open --raw action.yml
-            | ^awk -f update.awk
-                $"VERSION=($version)"
-                $"CHECKSUM=($checksum)"
-            | save --raw $"($temp_dir)/action.yml"
-        )
-        mv $"($temp_dir)/action.yml" .
+    #!/usr/bin/env bash
+    set -euo pipefail
+    repo=superfly/flyctl
+    echo "getting latest release..."
+    latest_tag="$(
+        gh release list --exclude-drafts --exclude-pre-releases \
+            --repo "${repo}" \
+            --json tagName,isLatest \
+            --jq '.[] | select(.isLatest).tagName'
+    )"
+    version="$(echo "${latest_tag}" | cut --characters 2-)"
+    artifact_name="flyctl_${version}_Linux_x86_64.tar.gz"
+    checksum="$(
+        gh release view \
+            "${latest_tag}" \
+            --repo "${repo}" \
+            --json assets \
+            --jq ".assets.[] | select(.name == \"${artifact_name}\").digest"
+    )"
+    checksum="$(echo "${checksum}" | awk -F: '$1 == "sha256" { printf($2) }')"
 
-    } catch {|err|
-        do $cleanup
-        error make $err
+    if [ "${checksum}" == "" ]; then
+        echo "unable to determine checksum for ${artifact_name} at ${latest_tag}"
+        exit 1
+    fi
+
+    temp_dir="$(mktemp --directory)"
+    cleanup() {
+        rm -rf "${temp_dir}"
     }
-    do $cleanup
+    trap 'cleanup' EXIT ERR
+
+    awk -f update.awk \
+        VERSION="${version}" \
+        CHECKSUM="${checksum}" \
+        <action.yml \
+        >"${temp_dir}/action.yml"
+    mv "${temp_dir}/action.yml" .
+
+    git diff action.yml
 
 # Update this repo from its copier template
 update-template:
