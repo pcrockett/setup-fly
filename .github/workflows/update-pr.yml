@@ -43,14 +43,14 @@ jobs:
             exit 0
           fi
 
-          # TODO: parse action.yml, get new version number, put in title and commit
+          new_version="$(yq --raw-output '.inputs.version.default' action.yml)"
           git add .
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Version bump"
+          git commit -m "Update to version ${new_version}"
           git push origin "${UPDATE_BRANCH_NAME}"
 
-          pr_title="Version bump ${new_version}"
+          pr_title="Update to version ${new_version}"
           if gh pr view >/dev/null 2>&1; then
             gh pr edit --title "${pr_title}"
           else
