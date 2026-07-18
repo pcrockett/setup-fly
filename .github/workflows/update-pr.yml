@@ -7,9 +7,13 @@ on:
   schedule:
     - cron: "38 4 * * 6"  # every Saturday at 04:38 UTC   <https://crontab.guru/#38_4_*_*_6>
 
+  # FIXME: temporary, just for testing
+  pull_request:
+    branches: ["**"]
+
 permissions:
-  # TODO: almost certainly needs different permissions
-  contents: read
+  contents: write
+  pull-requests: write
 
 env:
   UPDATE_BRANCH_NAME: "autoupdate"
@@ -30,23 +34,27 @@ jobs:
 
       - run: |
           if ! git switch "${UPDATE_BRANCH_NAME}"; then
-            git switch --create "${UPDATE_BRANCH_NAME}"
+            git switch --create "${UPDATE_BRANCH_NAME}" main
           fi
 
           just update
-          if git diff --quiet; then
+          if [ "$(git status --porcelain)" == "" ]; then
             echo "Already current!"
             exit 0
           fi
 
           # TODO: parse action.yml, get new version number, put in title and commit
           git add .
-          git commit -m "Version update"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Version bump"
           git push origin "${UPDATE_BRANCH_NAME}"
 
           pr_title="Version bump ${new_version}"
-          if gh pr view; then
+          if gh pr view >/dev/null 2>&1; then
             gh pr edit --title "${pr_title}"
           else
             gh pr create --title "${pr_title}" --body ""
           fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
