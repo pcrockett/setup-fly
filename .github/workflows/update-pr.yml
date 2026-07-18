@@ -44,6 +44,7 @@ jobs:
           fi
 
           new_version="$(yq --raw-output '.inputs.version.default' action.yml)"
+          echo "Found update: ${new_version}"
           git add .
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -52,8 +53,10 @@ jobs:
 
           pr_title="Update to version ${new_version}"
           if gh pr view >/dev/null 2>&1; then
+            echo "Updating existing PR..."
             gh pr edit --title "${pr_title}"
           else
+            echo "Creating new PR..."
             gh pr create --title "${pr_title}" --body ""
           fi
         env:
