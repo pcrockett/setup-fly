@@ -9,7 +9,7 @@ on:
 
   # FIXME: temporary, just for testing
   pull_request:
-    branches: ["**"]
+    branches: ["autoupdate-impl"]
 
 permissions:
   contents: write
