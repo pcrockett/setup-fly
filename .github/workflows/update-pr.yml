@@ -36,7 +36,7 @@ jobs:
           git log --all --graph --format=format:'%C(dim white)⟵  %C(reset)%C(bold blue)%h%C(reset)%C(auto)%d%C(reset) %C(bold cyan)%an%C(reset) %C(bold magenta)%cs
           %C(bold blue)   ⎩ %C(reset)%s'
           if ! git switch --create "${UPDATE_BRANCH_NAME}" "origin/${UPDATE_BRANCH_NAME}"; then
-            git switch --create "${UPDATE_BRANCH_NAME}" origin/main
+            git switch --create "${UPDATE_BRANCH_NAME}"
           fi
 
           just update
