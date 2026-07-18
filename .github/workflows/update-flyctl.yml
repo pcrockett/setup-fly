@@ -39,7 +39,7 @@ jobs:
             exit 0
           fi
 
-          new_version="$(yq --raw-output '.inputs.version.default' action.yml)"
+          new_version="$(yq eval '.inputs.version.default' action.yml)"
           echo "Found update: ${new_version}"
           git add .
           git config user.name "github-actions[bot]"
