@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
+
+name: Check for updates
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "38 4 * * 6"  # every Saturday at 04:38 UTC   <https://crontab.guru/#38_4_*_*_6>
+
+permissions:
+  # TODO: almost certainly needs different permissions
+  contents: read
+
+env:
+  UPDATE_BRANCH_NAME: "autoupdate"
+
+jobs:
+
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: pcrockett/setup-just@bfd0f2be2991d96e39d8d4c3bba4018d44857339  # v0.1.0
+
+      - run: |
+          if ! git switch "${UPDATE_BRANCH_NAME}"; then
+            git switch --create "${UPDATE_BRANCH_NAME}"
+          fi
+
+          just update
+          if git diff --quiet; then
+            echo "Already current!"
+            exit 0
+          fi
+
+          # TODO: parse action.yml, get new version number, put in title and commit
+          git add .
+          git commit -m "Version update"
+          git push origin "${UPDATE_BRANCH_NAME}"
+
+          pr_title="Version bump ${new_version}"
+          if gh pr view; then
+            gh pr edit --title "${pr_title}"
+          else
+            gh pr create --title "${pr_title}" --body ""
+          fi
