@@ -1,15 +1,11 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
 
-name: Check for updates
+name: Check for flyctl updates
 
 on:
   workflow_dispatch:
   schedule:
     - cron: "38 4 * * 6"  # every Saturday at 04:38 UTC   <https://crontab.guru/#38_4_*_*_6>
-
-  # FIXME: temporary, just for testing
-  pull_request:
-    branches: ["autoupdate-impl"]
 
 permissions:
   contents: write
