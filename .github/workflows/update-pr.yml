@@ -33,6 +33,8 @@ jobs:
       - uses: pcrockett/setup-just@bfd0f2be2991d96e39d8d4c3bba4018d44857339  # v0.1.0
 
       - run: |
+          git log --all --graph --format=format:'%C(dim white)⟵  %C(reset)%C(bold blue)%h%C(reset)%C(auto)%d%C(reset) %C(bold cyan)%an%C(reset) %C(bold magenta)%cs
+          %C(bold blue)   ⎩ %C(reset)%s'
           if ! git switch "${UPDATE_BRANCH_NAME}"; then
             git switch --create "${UPDATE_BRANCH_NAME}" main
           fi
