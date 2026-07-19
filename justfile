@@ -55,4 +55,4 @@ update:
 
 # Update this repo from its copier template
 update-template:
-    copier update
+    copier update --skip-answered

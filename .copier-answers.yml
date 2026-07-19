@@ -1,4 +1,4 @@
-_commit: ad18f08
+_commit: ea9afaa
 _src_path: gh:pcrockett/template-setup-action
 action_description: Installs flyctl in your GitHub workflows
 action_human_friendly_name: Setup Flyctl
