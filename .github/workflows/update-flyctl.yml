@@ -26,7 +26,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - uses: pcrockett/setup-just@bfd0f2be2991d96e39d8d4c3bba4018d44857339  # v0.1.0
+      - uses: pcrockett/setup-just@f92bfe35b28001602570caeeaff0eb7abb96eca1  # v0.1.1
 
       - run: |
           if ! git switch --create "${UPDATE_BRANCH_NAME}" "origin/${UPDATE_BRANCH_NAME}"; then
