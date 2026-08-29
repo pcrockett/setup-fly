@@ -5,10 +5,10 @@ description: 'Installs flyctl in your GitHub workflows'
 inputs:
   version:
     description: 'Version to install, ex: 0.4.61'
-    default: '0.4.87'
+    default: '0.4.95'
   checksum:
     description: 'SHA256 checksum of download artifact'
-    default: 'c5d0e5b058c551c62612a608d31181353a6bef808283bede80e3f0dd838f277c'
+    default: '580cbc80b2ce9f28350fd9a1638b44db0e9919338e179b263209035299c0a0e0'
 
 runs:
   using: "composite"
